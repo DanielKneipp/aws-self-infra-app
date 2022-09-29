@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: check-yaml
+        exclude: aws/*
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/psf/black
+    rev: 21.12b0
+    hooks:
+      - id: black
+        files: "/app/*"
+  - repo: https://github.com/aws-cloudformation/cfn-python-lint
+    rev: v0.65.1
+    hooks:
+      - id: cfn-python-lint
+        files: aws/.*\.(json|yml|yaml)$

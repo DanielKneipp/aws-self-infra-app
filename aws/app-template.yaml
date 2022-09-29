@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Python app deployment template'
+
+Parameters:
+  RepoUrl:
+    Description: Url of the repo.
+    Type: String
+  GithubConnArn:
+    Description: "Arn of the connection with Github"
+    Type: String
+
+Resources:
+  AppRunner:
+    Type: AWS::AppRunner::Service
+    Properties:
+      ServiceName: !Sub '${AWS::StackName}-service'
+      SourceConfiguration:
+        AuthenticationConfiguration:
+          ConnectionArn: !Ref GithubConnArn
+        AutoDeploymentsEnabled: false
+        CodeRepository:
+          RepositoryUrl: !Ref RepoUrl
+          SourceCodeVersion:
+            Type: BRANCH
+            Value: main
+          CodeConfiguration:
+            CodeConfigurationValues:
+              BuildCommand: pip install -r app/requirements.txt
+              Port: 8000
+              Runtime: PYTHON_3
+              StartCommand: uvicorn --app-dir=app/ main:app
+            ConfigurationSource: API
+      InstanceConfiguration:
+        Cpu: 1 vCPU
+        Memory: 2 GB
+
+Outputs:
+  AppRunner:
+    Description: URL of the deployed App Runner Service
+    Value: !Sub "https://${AppRunner.ServiceUrl}"
