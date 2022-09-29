@@ -1,5 +1,6 @@
 name: sync-main
 on:
+  workflow_dispatch:
   push:
     branches: [master]
 
@@ -28,4 +29,4 @@ jobs:
         no-fail-on-empty-changeset: "1"
         parameter-overrides: >-
           RepoUrl=${{ github.server_url }}/${{ github.repository }},
-          GithubConnArn=${{ secrets.GH_CONN_ARN }} # arn:aws:apprunner:us-east-1:428466743054:connection/github-personal/fbb0dad738c642668daf21336174aaea
+          GithubConnArn=${{ secrets.GH_CONN_ARN }}
