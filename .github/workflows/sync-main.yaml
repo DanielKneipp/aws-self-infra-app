@@ -2,7 +2,7 @@ name: sync-main
 on:
   workflow_dispatch:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   sync-main:
