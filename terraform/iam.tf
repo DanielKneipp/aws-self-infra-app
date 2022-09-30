@@ -60,20 +60,15 @@ data "aws_iam_policy_document" "app_infra_manager_policy" {
   }
 
   statement {
-    sid    = "CloudformationAdmin"
-    effect = "Allow"
-
-    resources = [
-      "arn:aws:cloudformation:*:*:*/*",
-    ]
-
-    actions = ["cloudformation:*"]
+    sid       = "CloudformationAdmin"
+    effect    = "Allow"
+    resources = ["arn:aws:cloudformation:*:*:*/*"]
+    actions   = ["cloudformation:*"]
   }
 }
 
 resource "aws_iam_policy" "app_infra_manager_policy" {
-  name = "app_infra_manager_policy"
-
+  name   = "app_infra_manager_policy"
   policy = data.aws_iam_policy_document.app_infra_manager_policy.json
 }
 
@@ -84,6 +79,11 @@ resource "aws_iam_role_policy_attachment" "app_infra_manager" {
 
 resource "aws_iam_user" "app_infra_manager" {
   name = "app_infra_manager"
+}
+
+resource "aws_iam_user_policy_attachment" "app_infra_manager" {
+  user       = aws_iam_user.app_infra_manager.name
+  policy_arn = aws_iam_policy.app_infra_manager_policy.arn
 }
 
 resource "aws_iam_access_key" "app_infra_manager" {
