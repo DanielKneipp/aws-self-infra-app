@@ -28,7 +28,7 @@ Resources:
               BuildCommand: pip install -r app/requirements.txt
               Port: 8000
               Runtime: PYTHON_3
-              StartCommand: uvicorn --host=0.0.0.0 --app-dir=app/ main:app
+              StartCommand: uvicorn --proxy-headers --host=0.0.0.0 --app-dir=app/ main:app
             ConfigurationSource: API
       InstanceConfiguration:
         Cpu: 1 vCPU
