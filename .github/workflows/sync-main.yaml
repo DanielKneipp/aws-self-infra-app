@@ -30,6 +30,7 @@ jobs:
 
     - name: Deploy to AWS CloudFormation
       uses: aws-actions/aws-cloudformation-github-deploy@v1
+      id: cf_deployment
       with:
         name: my-app
         template: aws/app-template.yaml
@@ -37,3 +38,9 @@ jobs:
         parameter-overrides: >-
           RepoUrl=${{ github.server_url }}/${{ github.repository }},
           GithubConnArn=${{ secrets.GH_CONN_ARN }}
+
+    - name: Install aws cli
+      uses: unfor19/install-aws-cli-action@v1.0.3
+
+    - name: Trigger App Runner deployment
+      run: aws apprunner start-dployment --service-arn {{ steps.cf_deployment.outputs.AppRunnerArn }}

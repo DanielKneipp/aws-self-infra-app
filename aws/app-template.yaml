@@ -17,7 +17,7 @@ Resources:
       SourceConfiguration:
         AuthenticationConfiguration:
           ConnectionArn: !Ref GithubConnArn
-        AutoDeploymentsEnabled: true
+        AutoDeploymentsEnabled: false
         CodeRepository:
           RepositoryUrl: !Ref RepoUrl
           SourceCodeVersion:
@@ -35,6 +35,9 @@ Resources:
         Memory: 2 GB
 
 Outputs:
-  AppRunner:
+  AppRunnerUrl:
     Description: URL of the deployed App Runner Service
     Value: !Sub "https://${AppRunner.ServiceUrl}"
+  AppRunnerArn:
+    Description: ARN of the deployed App Runner Service
+    Value: !GetAtt AppRunner.ServiceArn
