@@ -43,4 +43,4 @@ jobs:
       uses: unfor19/install-aws-cli-action@v1.0.3
 
     - name: Trigger App Runner deployment
-      run: aws apprunner start-dployment --service-arn {{ steps.cf_deployment.outputs.AppRunnerArn }}
+      run: aws apprunner start-deployment --service-arn ${{ steps.cf_deployment.outputs.AppRunnerArn }}
