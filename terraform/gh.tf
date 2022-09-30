@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "github_assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:DanielKneipp/aws-self-infra-app:main"]
+      values   = ["repo:DanielKneipp/aws-self-infra-app:ref:refs/heads/main"]
     }
 
     condition {
