@@ -9,6 +9,9 @@ concurrency:
   group: main
   cancel-in-progress: false
 
+env:
+  AWS_STACK_NAME: my-app
+
 jobs:
   sync-main:
     runs-on: ubuntu-latest
@@ -21,26 +24,53 @@ jobs:
     - name: Run pre-commit
       uses: pre-commit/action@v3.0.0
 
+    - name: Check if the app should be updated
+      uses: dorny/paths-filter@v2
+      id: app-changed
+      with:
+        filters: |
+          src:
+            - 'app/**'
+
+    - name: Check if AWS Cloudformation should be updated
+      uses: dorny/paths-filter@v2
+      id: aws-changed
+      with:
+        filters: |
+          src:
+            - 'aws/**'
+
     - name: Configure AWS credentials
       id: creds
       uses: aws-actions/configure-aws-credentials@v1
+      if: steps.app-changed.outputs.src == 'true' or steps.aws-changed.outputs.src == 'true'
       with:
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
 
     - name: Deploy to AWS CloudFormation
       uses: aws-actions/aws-cloudformation-github-deploy@v1
-      id: cf_deployment
+      if: steps.aws-changed.outputs.src == 'true'
+      id: aws-deployment
       with:
-        name: my-app
+        name: ${{ env.AWS_STACK_NAME }}
         template: aws/app-template.yaml
         no-fail-on-empty-changeset: "1"
         parameter-overrides: >-
           RepoUrl=${{ github.server_url }}/${{ github.repository }},
           GithubConnArn=${{ secrets.GH_CONN_ARN }}
 
-    - name: Install aws cli
+    - name: Install AWS cli
+      id: install-aws-cli
+      if: steps.app-changed.outputs.src == 'true'
       uses: unfor19/install-aws-cli-action@v1.0.3
 
     - name: Trigger App Runner deployment
-      run: aws apprunner start-deployment --service-arn ${{ steps.cf_deployment.outputs.AppRunnerArn }}
+      if: steps.install-aws-cli.outcome == 'success'
+      run: |
+        set -e
+        set -o pipefail
+
+        arn=$(aws cloudformation describe-stacks --stack-name="${AWS_STACK_NAME}" | jq -r '.Stacks[0].Outputs[] | select(.OutputKey == "AppRunnerArn") | .OutputValue')
+        echo "${arn}"
+        aws apprunner start-deployment --service-arn "${arn}"
