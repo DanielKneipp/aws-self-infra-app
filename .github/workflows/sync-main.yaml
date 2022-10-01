@@ -43,7 +43,7 @@ jobs:
     - name: Configure AWS credentials
       id: creds
       uses: aws-actions/configure-aws-credentials@v1
-      if: steps.app-changed.outputs.src == 'true' or steps.aws-changed.outputs.src == 'true'
+      if: steps.app-changed.outputs.src == 'true' || steps.aws-changed.outputs.src == 'true'
       with:
         aws-region: ${{ secrets.AWS_REGION }}
         role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
