@@ -107,11 +107,11 @@ AWS has a [step-by-step guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/
 
 ```bash
 # The issuer can be obtained at https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
-issuer_url='https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect'
-servername="$(curl -s https://token.actions.githubusercontent.com/.well-known/openid-configuration | jq -r '.jwks_uri' | sed -e 's|^[^/]*//||' -e 's|/.*$||')"
+issuer_url='https://token.actions.githubusercontent.com/.well-known/openid-configuration'
+servername="$(curl -s "${issuer_url}" | jq -r '.jwks_uri' | sed -e 's|^[^/]*//||' -e 's|/.*$||')"
 cert_info="$(echo -n | openssl s_client -servername "${servername}" -showcerts -connect "${servername}":443 2>/dev/null)"
-last_cert="$(echo $cert_info | awk '/-----BEGIN CERTIFICATE-----/{s=""} {s=s$0"\n"} /-----END CERTIFICATE-----/{cert=s} END {print cert}')"
-echo $last_cert | openssl x509 -fingerprint -noout | cut -d "=" -f2 | sed -e 's/://g' | tr '[:upper:]' '[:lower:]'
+last_cert="$(echo "${cert_info}" | awk '/-----BEGIN CERTIFICATE-----/{s=""} {s=s$0"\n"} /-----END CERTIFICATE-----/{cert=s} END {print cert}')"
+echo "${last_cert}" | openssl x509 -fingerprint -noout | cut -d "=" -f2 | sed -e 's/://g' | tr '[:upper:]' '[:lower:]'
 ```
 
 ### Giving AWS App Runner Access to Github
