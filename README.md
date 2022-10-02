@@ -17,7 +17,7 @@ This repo contains an example app with self-contained infrastructure-as-code. Wi
       - [Why API-triggered deployment?](#why-api-triggered-deployment)
   - [Putting everything together](#putting-everything-together)
     - [Update procedure](#update-procedure)
-    - [About how to refine the AWSrole for Github](#about-how-to-refine-the-awsrole-for-github)
+    - [About how to refine the AWS role for Github](#about-how-to-refine-the-aws-role-for-github)
   - [Clean-up](#clean-up)
 
 ## Context
@@ -67,14 +67,14 @@ The breakdown is:
 | Directory    | Description |
 |--------------|-------------|
 | `terraform/` | Contains the the necessary infrastructure to allow the Github Workflow (our automation tool for this example) to access and manage resources in AWS (our cloud provider). It usually would be in an independent repo managed by the platform team, but we will keep it here to for simplicity. |
-| `aws/`       | Has the Cloudformation stack definition (the cloud resources management tool used by the Development, which can, and in this case will, diverge from the tool used by the platform team). Their we can see the cloud resources used by the app (an [AWS App Runner]( https://aws.amazon.com/pt/apprunner/ )), compute resources required, listening port, how it should be built and executed. |
+| `aws/`       | Has the Cloudformation stack definition (the cloud resources management tool used by the Development, which can, and in this case will, diverge from the tool used by the platform team). There we can see the cloud resources used by the app (an [AWS App Runner]( https://aws.amazon.com/pt/apprunner/ )), compute resources required, listening port, how it should be built and executed. |
 | `app/`       | The app itself, which is just a python Front-end app that has one static index page and one dynamic page. |
-| `.github/`   | Contains the Github workflow used to sync the code in  `main`  branch (app and it's infrastructure) with the AWS account. |
+| `.github/`   | Contains the Github workflow used to sync the code in  `main`  branch (app and its infrastructure) with the AWS account. |
 
 In a nutshell, the way that it works is:
 
 - Github workflow assumes an AWS role provided by the platform team
-- The workflow deploys and keeps the cloudformation stack with the App Runner service up to date
+- The workflow deploys and keeps the Cloudformation stack with the App Runner service up to date
 - And if something change in the app code, the workflow also trigger the service redeployment via AWS API.
 
 If you are more of a visual learner, here is a diagram of how the whole integration is suppose to work, together with the separation of duties:
@@ -91,7 +91,7 @@ As state before, the platform responsibility will be to provide a way for the Gi
 
 Following security best practices, we will use a AWS role assumed by the workflow to interact with the cloud resources. This will avoid the usage of static credentials that could be leaked and have the time-consuming manual task of having to be rotated regularly.
 
-To give permissions to the workflow without the use of any kind of static credentials, we will set-up on aws an identity provider that will allow the workflows of this repo (`main` branch specifically) to assume a role on AWS. This restriction is defined as a role condition with the verification of the attribute value of `token.actions.githubusercontent.com:sub` (`terraform/iam-gh.tf` file). Pattern can be used to give a more broad permission to all branches or to all repos of the owner. You can go to the [Github docs](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) to know more about the OIDC configurations (and [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html) is also the AWS documentation about the subject)
+To give permissions to the workflow without the use of any kind of static credentials, we will set-up on AWS an identity provider that will allow the workflows of this repo (`main` branch specifically) to assume a role on AWS. This restriction is defined as a role condition with the verification of the attribute value of `token.actions.githubusercontent.com:sub` (`terraform/iam-gh.tf` file). Pattern can be used to give a more broad permission to all branches or to all repos of the owner. You can go to the [Github docs](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) to know more about the OIDC configurations (and [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html) is also the AWS documentation about the subject)
 
 With the role defined, it's only a matter of defining a policy that will allow the workflow to do its job and associate it with the role. In this example, we're giving very broad permissions (basically Cloudformation and App Runner administrator permissions) to keep the policy small and simple.
 
@@ -205,7 +205,7 @@ And going to the "Outputs", you should be able to see the url of the app. If the
 | Page Description | Image |
 | ---------------- | ----- |
 | Index page | ![](assets/app-home.png) |
-| Dynamic page accessed via custom path | ![](assets/app-item.png)
+| Dynamic page accessed via custom path | ![](assets/app-item.png) |
 
 And you can also see general information about the app just deployed in the AWS App Runner console:
 
@@ -235,9 +235,9 @@ Because of those features and others that could be enabled (like tracing), App R
 
 ### Update procedure
 
-And what needs to be done in order to update the running app? Just change the python ot html code and **push it to the `main` branch**! The workflow will do the rest. The developer only needs view access to the AWS console. Any write interaction is made either by the workflow or the platform team.
+And what needs to be done in order to update the running app? Just change the python or html code and **push it to the `main` branch**! The workflow will do the rest. The developer only needs view access to the AWS console. Any write interaction is made either by the workflow or the platform team.
 
-### About how to refine the AWSrole for Github
+### About how to refine the AWS role for Github
 
 Here's a quick tip about how to improve the role created for the Github workflow. With a more permissive role, you can see on CloudTrail exactly what actions the role perform on normal operations. Filtering the events by the user name `GithubActions`, you can determine each individual event generated by the role, as shown below.
 
