@@ -3,14 +3,14 @@ repos:
     rev: v2.3.0
     hooks:
       - id: check-yaml
-        exclude: aws/*
+        exclude: aws/.*
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
-        files: "/app/*"
+        files: "app/.*.py"
   - repo: https://github.com/aws-cloudformation/cfn-python-lint
     rev: v0.65.1
     hooks:
