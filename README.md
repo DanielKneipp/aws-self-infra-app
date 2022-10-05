@@ -26,7 +26,7 @@ More often than not, we see in companies developers struggling understating how 
 
 At the same time, the platform/infrastructure team responsible to prepare the production environments, don't have specific knowledge about individual apps, forcing them to apply sensible defaults that might work, but won't be optimized configurations for each app.
 
-*This creates the infamous Dev and Ops cilos, where those two teams struggle to communicate to achieve production-ready and optimized deployments.*
+*This creates the infamous Dev and Ops silos, where those two teams struggle to communicate to achieve production-ready and optimized deployments.*
 
 DevOps practices should help avoid this exact situation. Through automation, here is shown how an application deployment could be managed by developers directly from their own app repository.
 
